@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap; /* Ensure buttons wrap to the next line if necessary */
+        }
+        .row button, input[type='text'] {
+            width: 48%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            .row button, input[type='text'] {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+<script type="text/javascript">
+(function() {
+    'use strict';
+
+    // Add a button and display currently loaded values
+    function addElements() {
+        const container = document.createElement('div');
+        container.className = 'container'; // Assigning a class for styling purposes
+
+        // Calculate Position Size button
+        const calculatePositionSizeButton = document.createElement('button');
+        calculatePositionSizeButton.textContent = 'Calculate Position Size';
+        calculatePositionSizeButton.className = 'mobile-button'; // Assigning a class for styling purposes
+        calculatePositionSizeButton.addEventListener('click', calculatePositionSize);
+        container.appendChild(calculatePositionSizeButton);
+
+        // Values Div
+        const valuesDiv = document.createElement('div');
+        valuesDiv.id = 'valuesDiv';
+        valuesDiv.className = 'mobile-div'; // Assigning a class for styling purposes
+        container.appendChild(valuesDiv);
+
+        // Stop Loss Input
+        const stopLossInput = document.createElement('input');
+        stopLossInput.type = 'text';
+        stopLossInput.id = 'stopLossInput';
+        stopLossInput.placeholder = 'Enter SL in pts [%/100]';
+        stopLossInput.className = 'mobile-input'; // Assigning a class for styling purposes
+        container.appendChild(stopLossInput);
+
+        // Custom Stop Loss button
+        const customStopLossButton = document.createElement('button');
+        customStopLossButton.textContent = 'Custom Stop Loss';
+        customStopLossButton.className = 'mobile-button'; // Assigning a class for styling purposes
+        customStopLossButton.addEventListener('click', calculateCustomPositionSize);
+        container.appendChild(customStopLossButton);
+
+        // Create buttons for percentages from 0.11 to 0.31
+        for (let i = 0.11; i <= 0.31; i += 0.02) {
+            const row = document.createElement('div');
+            row.className = 'row';
+            container.appendChild(row);
+
+            for (let j = 0; j < 2 && i <= 0.31; j++, i += 0.01) {
+                const percentageButton = document.createElement('button');
+                percentageButton.textContent = `${i.toFixed(2)}%`;
+                percentageButton.className = 'mobile-button'; // Assigning a class for styling purposes
+                percentageButton.addEventListener('click', function() {
+                    calculateCustomPositionPoints(i);
+                });
+                row.appendChild(percentageButton);
+            }
+
+            i -= 0.01; // Adjust for the outer loop increment
+        }
+
+        // Append the container to the body
+        document.body.appendChild(container);
+
+        displayCurrentValues();
+    }
+
+    // Function to display currently loaded values
+    function displayCurrentValues() {
+        const accountSize = parseFloat(localStorage.getItem('accountSize')) || 'Not set';
+        const riskPerOrder = parseFloat(localStorage.getItem('riskPerOrder')) || 'Not set';
+        document.getElementById('valuesDiv').innerHTML = `Account Size: ${accountSize}, Risk Per Order: ${riskPerOrder}%`;
+
+        // Bind function keys (F1 to F12) to set different stop loss values
+        const storedAccountSize = parseFloat(localStorage.getItem('accountSize'));
+        const storedRiskPerOrder = parseFloat(localStorage.getItem('riskPerOrder'));
+        if (!isNaN(storedAccountSize) && !isNaN(storedRiskPerOrder)) {
+            bindFunctionKeys(storedAccountSize, storedRiskPerOrder);
+        }
+    }
+
+    // Function to handle button click event
+    function calculatePositionSize() {
+        // Retrieve account size and risk per order from localStorage
+        let accountSize = parseFloat(localStorage.getItem('accountSize')) || null;
+        let riskPerOrder = parseFloat(localStorage.getItem('riskPerOrder')) || null;
+
+        // Prompt the user to enter account size and risk per order if not already stored
+        const accountSizeInput = prompt("Enter account size:");
+        const riskPerOrderInput = prompt("Enter risk per order (%):");
+        if (accountSizeInput !== null && riskPerOrderInput !== null) {
+            // Parse the input strings into numbers
+            accountSize = parseFloat(accountSizeInput);
+            riskPerOrder = parseFloat(riskPerOrderInput);
+
+            // Check if the input is valid
+            if (!isNaN(accountSize) && !isNaN(riskPerOrder)) {
+                // Store account size and risk per order in localStorage
+                localStorage.setItem('accountSize', accountSize);
+                localStorage.setItem('riskPerOrder', riskPerOrder);
+
+                // Display the updated values
+                displayCurrentValues();
+            } else {
+                alert("Invalid input. Please enter valid numbers.");
+            }
+        }
+    }
+
+    // Function to bind function keys (F1 to F12) to set different stop loss values
+    function bindFunctionKeys(accountSize, riskPerOrder) {
+        const stopLossIncrements = [0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.21, 0.22]; // Stop loss increments in percentage
+
+        // Bind function keys (F1 to F12) to set different stop loss values
+        for (let i = 0; i < stopLossIncrements.length; i++) {
+            const stopLossPercentage = stopLossIncrements[i];
+            const positionSize = calculatePositionSizeWithStopLoss(accountSize, riskPerOrder, stopLossPercentage);
+
+            // Bind the function key to copy the calculated position size to clipboard
+            bindKeyToCopyPositionSize(positionSize, i + 1);
+        }
+    }
+
+    // Function to calculate position size based on account size, risk per order, and stop loss percentage
+    function calculatePositionSizeWithStopLoss(accountSize, riskPerOrder, stopLossPercentage) {
+        return (accountSize * riskPerOrder / 100) / (stopLossPercentage / 100);
+    }
+
+    // Function to bind a function key to copy the calculated position size to clipboard
+    function bindKeyToCopyPositionSize(positionSize, functionKeyIndex) {
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'F' + functionKeyIndex) {
+                event.preventDefault();
+                copyToClipboard(positionSize.toFixed(2));
+            }
+        });
+    }
+
+    // Function to bind custom stop loss button
+    function calculateCustomPositionSize() {
+        const stopLossInput = document.getElementById('stopLossInput');
+        const stopLossValue = stopLossInput.value;
+        const accountSize = parseFloat(localStorage.getItem('accountSize')) || null;
+        const riskPerOrder = parseFloat(localStorage.getItem('riskPerOrder')) || null;
+
+        if (stopLossValue !== null && !isNaN(accountSize) && !isNaN(riskPerOrder)) {
+            const stopLossPercentage = parseFloat(stopLossValue) / 100; // Divide by 100
+            const positionSize = calculatePositionSizeWithStopLoss(accountSize, riskPerOrder, stopLossPercentage);
+            copyToClipboard(positionSize.toFixed(2));
+            // Clear the text box
+            stopLossInput.value = '';
+        } else {
+            alert("Invalid input. Please enter valid stop loss percentage and make sure account size and risk per order are set.");
+        }
+    }
+
+    // Function to bind custom stop loss button
+    function calculateCustomPositionPoints(stopLossPercentage) {
+        const accountSize = parseFloat(localStorage.getItem('accountSize')) || null;
+        const riskPerOrder = parseFloat(localStorage.getItem('riskPerOrder')) || null;
+
+        if (!isNaN(stopLossPercentage) && !isNaN(accountSize) && !isNaN(riskPerOrder)) {
+            const positionSize = calculatePositionSizeWithStopLoss(accountSize, riskPerOrder, stopLossPercentage);
+            copyToClipboard(positionSize.toFixed(2));
+        } else {
+            alert("Invalid input. Please enter valid stop loss percentage and make sure account size and risk per order are set.");
+        }
+    }
+
+    // Function to copy text to clipboard
+    function copyToClipboard(text) {
+        const input = document.createElement('textarea');
+        input.value = text;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        // alert("Position size copied to clipboard: " + text);
+    }
+
+    // Add the button and display currently loaded values when the page loads
+    addElements();
+})();
+</script>
+    </div>
+</body>
+</html>

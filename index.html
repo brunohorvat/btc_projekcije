@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Predikcije 2025</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://widgets.coingecko.com/coingecko-coin-ticker-widget.js"></script>
+    <script src="//widget.time.is/en.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Bitcoin Predikcije za 2025. godinu</h1>
+        <div class="ticker-and-time">
+            <div class="widget-box">
+              <!-- TradingView Widget BEGIN -->
+<div class="tradingview-widget-container">
+  <div class="tradingview-widget-container__widget"></div>
+  <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text"></span></a></div>
+  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+  {
+  "symbol": "BINANCE:BTCUSDT",
+  "width": "350",
+  "height": "220",
+  "locale": "en",
+  "dateRange": "12M",
+  "colorTheme": "light",
+  "isTransparent": false,
+  "autosize": false,
+  "largeChartUrl": "",
+  "chartOnly": false,
+  "noTimeScale": false
+}
+  </script>
+</div>
+<!-- TradingView Widget END -->
+                <div id="current-time" class="current-time"></div>
+            </div>
+        </div>
+        <p class="price-info">Cijena na dan 16.6.2024. 12:00 (UTC +2) -> 66 395 USDT</p>
+        <div id="countdown"></div>
+    </header>
+    <main>
+        <section id="predictions">
+            <h2>Predikcije za 16.6.2025. 12:00 (UTC+2)</h2>
+            <table id="predictions-table">
+                <!-- Table content as before -->
+            </table>
+
+        </section>
+         <section>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Analitičar</th>
+                        <th>Predviđena cijena (USDT)</th>
+                        <th>Promjena (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Ivo Aščić</td>
+                        <td>100,000</td>
+                        <td>+50.61%</td>
+                    </tr>
+                    <tr>
+                        <td>Valerian Bahnik</td>
+                        <td>47,500</td>
+                        <td>-28.45%</td>
+                    </tr>
+                    <tr>
+                        <td>Bruno Horvat</td>
+                        <td>210,000</td>
+                        <td>+216.18%</td>
+                    </tr>
+                    <tr>
+                        <td>Matej Veltruski</td>
+                        <td>260,600</td>
+                        <td>+292.50%</td>
+                    </tr>
+                    <tr>
+                        <td>Filip Šangut</td>
+                        <td>45,000</td>
+                        <td>-32.20%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        <section>
+            <h2>Ostale predikcije za 2025. godinu</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Analitičar</th>
+                        <th>Predviđena cijena (USDT)</th>
+                        <th>Datum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Matej Veltruski</td>
+                        <td>340,000</td>
+                        <td>Bliže 21.9.2025.</td>
+                    </tr>
+                    <tr>
+                        <td>Bruno Horvat</td>
+                        <td>300,000</td>
+                        <td>Q4 2025.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="leaderboard">
+            <h2>Leaderboard</h2>
+            <div class="leaderboard-info">
+                <p><strong>Current Bitcoin Price:</strong> <span id="current-price"></span> USDT</p>
+            </div>
+            <table id="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Position</th>
+                        <th>Analyst</th>
+                        <th>Original Prediction</th>
+                        <th>Current Price [USDT]</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <!-- Leaderboard entries will be dynamically added here -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Bitcoin Predikcije by Bruno Horvat</p>
+    </footer>
+
+    <script>
+        // Function to update current time every second
+        function updateCurrentTime() {
+            var now = new Date();
+            document.getElementById("current-time").innerHTML = now.toLocaleTimeString();
+        }
+        setInterval(updateCurrentTime, 1000);
+
+        // Placeholder for prediction data (replace with actual data if needed)
+        var predictions = [
+            { analyst: "Ivo Aščić", originalPrediction: 100000 },
+            { analyst: "Valerian Bahnik", originalPrediction: 47500 },
+            { analyst: "Bruno Horvat", originalPrediction: 210000 },
+            { analyst: "Matej Veltruski", originalPrediction: 260600 },
+            { analyst: "Filip Šangut", originalPrediction: 45000 }
+            // Add more predictions as needed
+        ];
+
+        // Function to fetch current Bitcoin price from Binance API
+        async function getCurrentBitcoinPrice() {
+            try {
+                const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch Bitcoin price');
+                }
+                const data = await response.json();
+                return parseFloat(data.price);
+            } catch (error) {
+                console.error('Error fetching Bitcoin price:', error);
+                return null;
+            }
+        }
+
+        // Function to calculate closest prediction
+        function calculateClosestPrediction(currentPrice) {
+            var closestAnalyst = null;
+            var closestDifference = Infinity;
+
+            predictions.forEach(function(prediction) {
+                var difference = Math.abs(prediction.originalPrediction - currentPrice);
+                if (difference < closestDifference) {
+                    closestDifference = difference;
+                    closestAnalyst = prediction.analyst;
+                }
+            });
+
+            return closestAnalyst;
+        }
+
+        // Function to update leaderboard with closest prediction
+        async function updateLeaderboard() {
+            var currentPrice = await getCurrentBitcoinPrice();
+            if (currentPrice !== null) {
+                // Update current price display
+                document.getElementById("current-price").textContent = currentPrice.toLocaleString(undefined, { maximumFractionDigits:  1});
+
+                // Update leaderboard table
+                var leaderboardBody = document.getElementById("leaderboard-body");
+                leaderboardBody.innerHTML = ""; // Clear previous entries
+
+                // Calculate closest analyst
+                var closestAnalyst = calculateClosestPrediction(currentPrice);
+
+                // Add closest analyst as first row
+                var closestRow = document.createElement("tr");
+                closestRow.classList.add("first-row"); // Add class for styling
+                closestRow.innerHTML = "<td>1</td><td>" + closestAnalyst + "</td><td>" + getOriginalPrediction(closestAnalyst) + "</td><td>" + currentPrice.toLocaleString(undefined, { maximumFractionDigits: 0 }) + "</td>";
+                leaderboardBody.appendChild(closestRow);
+
+                // Add other analysts (excluding closest) sorted by original prediction
+                var sortedPredictions = predictions.slice().sort(function(a, b) {
+                    return a.originalPrediction - b.originalPrediction;
+                });
+
+                sortedPredictions.forEach(function(prediction, index) {
+                    if (prediction.analyst !== closestAnalyst) {
+                        var row = document.createElement("tr");
+                        row.innerHTML = "<td>" + (index + 2) + "</td><td>" + prediction.analyst + "</td><td>" + prediction.originalPrediction.toLocaleString() + "</td><td>" + "</td>";
+                        leaderboardBody.appendChild(row);
+                    }
+                });
+            }
+        }
+
+        // Function to get original prediction from predictions array
+        function getOriginalPrediction(analyst) {
+            var prediction = predictions.find(function(pred) {
+                return pred.analyst === analyst;
+            });
+            return prediction ? prediction.originalPrediction.toLocaleString() : "";
+        }
+
+        // Update leaderboard periodically (every 30 seconds in this example)
+        setInterval(updateLeaderboard, 1000); // 30 seconds
+
+        // Initial leaderboard update
+        updateLeaderboard();
+    </script>
+
+
+
+        <script>
+        // Set the date we're counting down to
+        var countDownDate = new Date("Jun 16, 2025 12:00:00 UTC+2").getTime();
+
+        // Update the count down every 1 second
+        var countdownfunction = setInterval(function() {
+
+            // Get today's date and time
+            var now = new Date().getTime();
+
+            // Find the distance between now and the count down date
+            var distance = countDownDate - now;
+
+            // Time calculations for days, hours, minutes and seconds
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Display the result in the element with id="countdown"
+            document.getElementById("countdown").innerHTML = "Odbrojavanje: " + days + "d " + hours + "h "
+            + minutes + "m " + seconds + "s ";
+
+            // If the count down is finished, write some text
+            if (distance < 0) {
+                clearInterval(countdownfunction);
+                document.getElementById("countdown").innerHTML = "EXPIRED";
+            }
+        }, 1000);
+
+        // Function to update current time every second
+        function updateCurrentTime() {
+            var now = new Date();
+            document.getElementById("current-time").innerHTML = now.toLocaleTimeString();
+        }
+        setInterval(updateCurrentTime, 1000);
+    </script>
+
+</body>
+</html>
